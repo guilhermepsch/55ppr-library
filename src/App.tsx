@@ -1,5 +1,5 @@
 import { Routes, Route } from 'react-router-dom';
-import Home from './components/Home';
+import Home from './views/Home';
 import BookController from './controllers/BookController';
 import { BookRepository } from './repositories/BookRepository';
 
