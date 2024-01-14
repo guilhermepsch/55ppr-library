@@ -12,38 +12,43 @@ export default class BookController implements Observer {
 		this.bookView = new BookView(
 			this.bookRepository.list(),
 			this.delete.bind(this),
+			this.upsert.bind(this),
 		);
 		this.bookRepository.addObserver(this);
 	}
 
-	public create(
-		title: string,
-		author: string,
-		isbn: string,
-		availableCopies: number,
-	): Book {
-		const book = new Book(
-			this.bookRepository.list().length + 1,
-			title,
-			author,
-			true,
-			isbn,
-			availableCopies,
-		);
-
-		return this.bookRepository.save(book);
-	}
-
-	public update(
+	public upsert(
 		id: number,
 		title: string,
 		author: string,
+		isAvailable: boolean,
 		isbn: string,
 		availableCopies: number,
-	): Book | undefined {
-		const book = new Book(id, title, author, true, isbn, availableCopies);
-
-		return this.bookRepository.update(book);
+	) {
+		if (Number.isNaN(id) || id == undefined) {
+			id = 0;
+		}
+		if (title == undefined) {
+			throw new Error('Title is required');
+		}
+		if (author == undefined) {
+			throw new Error('Author is required');
+		}
+		if (isbn == undefined) {
+			throw new Error('ISBN is required');
+		}
+		if (Number.isNaN(availableCopies) || availableCopies == undefined) {
+			availableCopies = 0;
+		}
+		const book = new Book(
+			id,
+			title,
+			author,
+			isAvailable,
+			isbn,
+			availableCopies,
+		);
+		return this.bookRepository.upsert(book);
 	}
 
 	public delete(id: number) {
@@ -60,6 +65,5 @@ export default class BookController implements Observer {
 
 	public updateFromObserver(): void {
 		this.bookView.updateTable(this.list());
-        console.log('BookController: updateFromObserver');
 	}
 }

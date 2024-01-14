@@ -4,7 +4,7 @@ import BookController from './controllers/BookController';
 import { BookRepository } from './repositories/BookRepository';
 
 function App() {
-	const bookRepository = new BookRepository();
+	const bookRepository = BookRepository.getInstance();
 	const bookController = new BookController(bookRepository);
 
 	return (
