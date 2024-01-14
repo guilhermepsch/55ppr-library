@@ -9,7 +9,7 @@ function App() {
 
 	return (
 		<Routes>
-					<Route path="/books" element={bookController.renderView()} />
+					<Route path="/books" element={bookController.getView().renderView()} />
 					<Route path="/" element={<Home />} />
 		</Routes>
 	);
