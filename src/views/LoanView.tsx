@@ -1,80 +1,94 @@
-import NavBar from '../components/NavBar';
-import { Book } from '../models/Book';
 import { ArrowClockwise } from '@phosphor-icons/react';
+import NavBar from '../components/NavBar';
+import { Loan } from '../models/Loan';
+import { BookView } from './BookView';
+import { UserView } from './UserView';
 
-export class BookView {
-	books: Book[];
+export class LoanView {
+	loans: Loan[];
 	handleDelete: (id: number) => void;
 	handleSave: (
 		id: number,
-		title: string,
-		author: string,
-		isAvailable: boolean,
-		isbn: string,
-		availableCopies: number,
+		bookId: number,
+		userId: number,
+		loanDate: Date,
+		returnDate?: Date,
 	) => void;
 
 	constructor(
-		books: Book[],
+		loans: Loan[],
 		handleDelete: (id: number) => void,
 		handleSave: (
 			id: number,
-			title: string,
-			author: string,
-			isAvailable: boolean,
-			isbn: string,
-			availableCopies: number,
+			bookId: number,
+			userId: number,
+			loanDate: Date,
+			returnDate?: Date,
 		) => void,
 	) {
-		this.books = books;
+		this.loans = loans;
 		this.handleDelete = handleDelete;
 		this.handleSave = handleSave;
 	}
 
-	public updateTable(books: Book[]) {
-		this.books = books;
-		const tbody = document.getElementById('book-tbody');
+	public updateTable(loans: Loan[]) {
+		this.loans = loans;
+		const tbody = document.getElementById('loan-tbody');
 		if (!tbody) return;
 		tbody.innerHTML = '';
-		books.forEach(book => {
-			tbody.appendChild(this.createBookRow(book));
+		loans.forEach(loan => {
+			tbody.appendChild(this.createLoanRow(loan));
+		});
+	}
+
+	public loadTable() {
+		const tbody = document.getElementById('loan-tbody');
+		if (!tbody) return;
+    tbody.innerHTML = '';
+		this.loans.forEach(loan => {
+			tbody.appendChild(this.createLoanRow(loan));
 		});
 	}
 
 	public clearTable() {
-		const tbody = document.getElementById('book-tbody');
+		const tbody = document.getElementById('loan-tbody');
 		if (!tbody) return;
 		tbody.innerHTML = '';
-	}
-
-	public loadTable() {
-		const tbody = document.getElementById('book-tbody');
-		if (!tbody) return;
-		tbody.innerHTML = '';
-		this.books.forEach(book => {
-			tbody.appendChild(this.createBookRow(book));
-		});
 	}
 
 	public edit(id: number) {
-		const book = this.books.find(book => book.id === id);
-		if (!book) return;
-		this.getFormFieldId().value = book.id.toString();
-		this.getFormFieldTitle().value = book.title;
-		this.getFormFieldAuthor().value = book.author;
-		this.getFormFieldIsbn().value = book.isbn;
-		this.getFormFieldAvailableCopies().value =
-			book.availableCopies.toString();
-		this.getFormFieldIsAvailable().value = book.isAvailable.toString();
+		const loan = this.loans.find(loan => loan.id === id);
+		if (!loan) return;
+		this.getFormFieldId().value = loan.id.toString();
+		this.getFormFieldBookId().value = loan.bookId.toString();
+		this.getFormFieldUserId().value = loan.userId.toString();
+		this.getFormFieldLoanDate().value = loan.loanDate
+			.toISOString()
+			.split('T')[0];
+		this.getFormFieldReturnDate().value = loan.returnDate
+			? loan.returnDate.toISOString().split('T')[0]
+			: '';
 	}
 
 	public renderView(): JSX.Element {
+		const bookView = new BookView(
+			[],
+			() => {},
+			() => {},
+		);
+		bookView.clearTable();
+		const userView = new UserView(
+			[],
+			() => {},
+			() => {},
+		);
+		userView.clearTable();
 		return (
 			<>
 				<NavBar clearTable={this.clearTable.bind(this)} />
 				<div className="w-full flex items-center flex-col">
-					{this.getBookForm()}
-					<h2 className="text-3xl font-bold mb-4">Book List</h2>
+					{this.getLoanForm()}
+					<h2 className="text-3xl font-bold mb-4">Loan List</h2>
 					<button
 						className="bg-purple-500 hover:bg-purple-700 rounded-full text-white font-bold w-10 h-10 flex items-center justify-center focus:outline-none focus:shadow-outline"
 						onClick={e => {
@@ -85,65 +99,60 @@ export class BookView {
 					</button>
 					<table
 						className="min-w-full divide-y divide-gray-200"
-						id="book-table">
+						id="loan-table">
 						<thead>
 							<tr>
 								<th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
 									ID
 								</th>
 								<th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-									Title
+									Book ID
 								</th>
 								<th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-									Author
+									User ID
 								</th>
 								<th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-									Available
+									Loan Date
 								</th>
 								<th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-									ISBN
-								</th>
-								<th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-									Available Copies
+									Return Date
 								</th>
 								<th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
 									Action
 								</th>
 							</tr>
 						</thead>
-						<tbody id="book-tbody"></tbody>
+						<tbody id="loan-tbody"></tbody>
 					</table>
 				</div>
 			</>
 		);
 	}
 
-	public createBookRow(book: Book) {
+	public createLoanRow(loan: Loan) {
 		const row = document.createElement('tr');
 
 		const idCell = document.createElement('td');
-		idCell.textContent = book.id.toString();
+		idCell.textContent = loan.id.toString();
 		idCell.classList.add('px-6', 'py-4', 'whitespace-nowrap');
 
-		const titleCell = document.createElement('td');
-		titleCell.textContent = book.title;
-		titleCell.classList.add('px-6', 'py-4', 'whitespace-nowrap');
+		const bookIdCell = document.createElement('td');
+		bookIdCell.textContent = loan.bookId.toString();
+		bookIdCell.classList.add('px-6', 'py-4', 'whitespace-nowrap');
 
-		const authorCell = document.createElement('td');
-		authorCell.textContent = book.author;
-		authorCell.classList.add('px-6', 'py-4', 'whitespace-nowrap');
+		const userIdCell = document.createElement('td');
+		userIdCell.textContent = loan.userId.toString();
+		userIdCell.classList.add('px-6', 'py-4', 'whitespace-nowrap');
 
-		const isAvailableCell = document.createElement('td');
-		isAvailableCell.textContent = book.isAvailable.toString();
-		isAvailableCell.classList.add('px-6', 'py-4', 'whitespace-nowrap');
+		const loanDateCell = document.createElement('td');
+		loanDateCell.textContent = loan.loanDate.toISOString().split('T')[0];
+		loanDateCell.classList.add('px-6', 'py-4', 'whitespace-nowrap');
 
-		const isbnCell = document.createElement('td');
-		isbnCell.textContent = book.isbn;
-		isbnCell.classList.add('px-6', 'py-4', 'whitespace-nowrap');
-
-		const availableCopiesCell = document.createElement('td');
-		availableCopiesCell.textContent = book.availableCopies.toString();
-		availableCopiesCell.classList.add('px-6', 'py-4', 'whitespace-nowrap');
+		const returnDateCell = document.createElement('td');
+		returnDateCell.textContent = loan.returnDate
+			? loan.returnDate.toISOString().split('T')[0]
+			: '';
+		returnDateCell.classList.add('px-6', 'py-4', 'whitespace-nowrap');
 
 		const deleteButton = document.createElement('button');
 		deleteButton.textContent = 'Delete';
@@ -164,7 +173,7 @@ export class BookView {
 			'ease-in-out',
 		);
 		deleteButton.addEventListener('click', () => {
-			this.handleDelete(book.id);
+			this.handleDelete(loan.id);
 		});
 
 		const editButton = document.createElement('button');
@@ -186,7 +195,7 @@ export class BookView {
 			'ease-in-out',
 		);
 		editButton.addEventListener('click', () => {
-			this.edit(book.id);
+			this.edit(loan.id);
 		});
 
 		const actionsCell = document.createElement('td');
@@ -201,20 +210,20 @@ export class BookView {
 		actionsCell.appendChild(editButton);
 
 		row.appendChild(idCell);
-		row.appendChild(titleCell);
-		row.appendChild(authorCell);
-		row.appendChild(isAvailableCell);
-		row.appendChild(isbnCell);
-		row.appendChild(availableCopiesCell);
+		row.appendChild(bookIdCell);
+		row.appendChild(userIdCell);
+		row.appendChild(loanDateCell);
+		row.appendChild(returnDateCell);
 		row.appendChild(actionsCell);
+
 		return row;
 	}
 
-	public getBookForm() {
+	public getLoanForm() {
 		return (
 			<div className="w-full flex items-center flex-col">
-				<h2 className="text-3xl font-bold mb-4">Add Book</h2>
-				<form id="book-form" className="w-full max-w-lg">
+				<h2 className="text-3xl font-bold mb-4">Add Loan</h2>
+				<form id="loan-form" className="w-full max-w-lg">
 					<div className="flex flex-wrap -mx-3 mb-6">
 						<div className="w-full px-3 mb-6">
 							<label
@@ -234,86 +243,60 @@ export class BookView {
 						<div className="w-full md:w-1/2 px-3 mb-6 md:mb-0">
 							<label
 								className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
-								htmlFor="title">
-								Title
+								htmlFor="bookId">
+								Book ID
 							</label>
 							<input
-								id="title"
-								name="title"
+								id="bookId"
+								name="bookId"
 								className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white"
-								type="text"
-								placeholder="Title"
+								type="number"
+								placeholder="Book ID"
 							/>
 						</div>
 						<div className="w-full md:w-1/2 px-3">
 							<label
 								className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
-								htmlFor="author">
-								Author
+								htmlFor="userId">
+								User ID
 							</label>
 							<input
-								id="author"
-								name="author"
+								id="userId"
+								name="userId"
 								className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white"
-								type="text"
-								placeholder="Author"
+								type="number"
+								placeholder="User ID"
 							/>
 						</div>
 					</div>
-					<div className="flex flex-wrap -mx-3 mb-6">
-						<div className="w-full px-3">
-							<label
-								className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
-								htmlFor="isbn">
-								ISBN
-							</label>
-							<input
-								id="isbn"
-								name="isbn"
-								className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white"
-								type="text"
-								placeholder="ISBN"
-							/>
-						</div>
-					</div>
-					<div className="flex flex-wrap -mx-3 mb-6">
+					<div className="flex flex-wrap -mx-3 mb-2">
 						<div className="w-full md:w-1/2 px-3 mb-6 md:mb-0">
 							<label
 								className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
-								htmlFor="availableCopies">
-								Available Copies
+								htmlFor="loanDate">
+								Loan Date
 							</label>
 							<input
-								id="availableCopies"
-								name="availableCopies"
+								id="loanDate"
+								name="loanDate"
 								className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white"
-								type="number"
-								placeholder="Available Copies"
+								type="date"
+								placeholder="Loan Date"
 							/>
 						</div>
 						<div className="w-full md:w-1/2 px-3">
 							<label
 								className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
-								htmlFor="isAvailable">
-								Available
+								htmlFor="returnDate">
+								Return Date
 							</label>
-							<div className="relative">
-								<select
-									id="isAvailable"
-									name="isAvailable"
-									className="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
-									<option value="true">Yes</option>
-									<option value="false">No</option>
-								</select>
-								<div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-									<svg
-										className="fill-current h-4 w-4"
-										xmlns="http://www.w3.org/2000/svg"
-										viewBox="0 0 20 20">
-										<path d="M7 7l3-3 3 3m0 6l-3 3-3-3" />
-									</svg>
-								</div>
-							</div>
+							<input
+								id="returnDate"
+								name="returnDate"
+								className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white"
+								type="date"
+								placeholder="Return Date (Optional)"
+							/>
 						</div>
 					</div>
 					<div className="flex flex-wrap -mx-3 mb-2">
@@ -325,19 +308,24 @@ export class BookView {
 									e.preventDefault();
 									this.handleSave(
 										parseInt(this.getFormFieldId().value),
-										this.getFormFieldTitle().value,
-										this.getFormFieldAuthor().value,
-										this.getFormFieldIsAvailable().value ===
-											'true',
-										this.getFormFieldIsbn().value,
 										parseInt(
-											this.getFormFieldAvailableCopies()
-												.value,
+											this.getFormFieldBookId().value,
 										),
+										parseInt(
+											this.getFormFieldUserId().value,
+										),
+										new Date(
+											this.getFormFieldLoanDate().value,
+										),
+										this.getFormFieldReturnDate().value
+											? new Date(
+													this.getFormFieldReturnDate().value,
+											  )
+											: undefined,
 									);
 									this.resetForm();
 								}}>
-								Salvar
+								Save
 							</button>
 							<button
 								type="button"
@@ -359,28 +347,24 @@ export class BookView {
 		return document.getElementById('id') as HTMLInputElement;
 	}
 
-	public getFormFieldTitle() {
-		return document.getElementById('title') as HTMLInputElement;
+	public getFormFieldBookId() {
+		return document.getElementById('bookId') as HTMLInputElement;
 	}
 
-	public getFormFieldAuthor() {
-		return document.getElementById('author') as HTMLInputElement;
+	public getFormFieldUserId() {
+		return document.getElementById('userId') as HTMLInputElement;
 	}
 
-	public getFormFieldIsbn() {
-		return document.getElementById('isbn') as HTMLInputElement;
+	public getFormFieldLoanDate() {
+		return document.getElementById('loanDate') as HTMLInputElement;
 	}
 
-	public getFormFieldAvailableCopies() {
-		return document.getElementById('availableCopies') as HTMLInputElement;
-	}
-
-	public getFormFieldIsAvailable() {
-		return document.getElementById('isAvailable') as HTMLInputElement;
+	public getFormFieldReturnDate() {
+		return document.getElementById('returnDate') as HTMLInputElement;
 	}
 
 	public getForm() {
-		return document.getElementById('book-form') as HTMLFormElement;
+		return document.getElementById('loan-form') as HTMLFormElement;
 	}
 
 	public resetForm() {

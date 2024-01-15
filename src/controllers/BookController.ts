@@ -64,6 +64,7 @@ export default class BookController implements Observer {
 	}
 
 	public updateFromObserver(): void {
+		console.log('Updating book view');
 		this.bookView.updateTable(this.list());
 	}
 }

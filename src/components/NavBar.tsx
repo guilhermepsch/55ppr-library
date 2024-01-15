@@ -1,19 +1,54 @@
 import { Link } from 'react-router-dom';
 
-export default function NavBar() {
+interface NavBarProps {
+	clearTable: () => void;
+}
+
+export default function NavBar({ clearTable }: NavBarProps) {
 	return (
-		<div className="App">
-			<nav className="bg-blue-500 p-4">
-				<ul className="flex space-x-4 text-white">
-					<li>
-						<Link to="/">Home</Link>
-					</li>
-					<li>
-						<Link to="/books">Livros</Link>
-					</li>
-				</ul>
-			</nav>
-			<div className="container mx-auto mt-4"></div>
-		</div>
+		<nav className="bg-gray-800 text-white p-4">
+			<div className="flex justify-between">
+				<div className="flex">
+					<Link
+						to="/"
+						className="text-2xl font-bold hover:text-gray-300"
+						onClick={clearTable}
+					>
+						Biblioteca
+					</Link>
+					<Link
+						to="/users"
+						className="ml-4 hover:text-gray-300"
+						onClick={clearTable}
+					>
+						Usuários
+					</Link>
+					<Link
+						to="/books"
+						className="ml-4 hover:text-gray-300"
+						onClick={clearTable}
+					>
+						Livros
+					</Link>
+					<Link
+						to="/loans"
+						className="ml-4 hover:text-gray-300"
+						onClick={clearTable}
+					>
+						Empréstimos
+					</Link>
+				</div>
+				<div className="flex">
+					<Link
+						to="/"
+						className="ml-4 hover:text-gray-300"
+						onClick={clearTable}
+					>
+						Sobre
+					</Link>
+				</div>
+			</div>
+		</nav>
 	);
 }
+		
