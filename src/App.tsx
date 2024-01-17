@@ -6,19 +6,24 @@ import { ConcreteLoanRepositoryCreator } from './patterns/factoryMethod/Concrete
 import { ConcreteUserRepositoryCreator } from './patterns/factoryMethod/ConcreteUserRepositoryCreator';
 import UserController from './controllers/UserController';
 import LoanController from './controllers/LoanController';
+import { LoanFacade } from './patterns/facade/LoanFacade';
 
 function App() {
 	const bookRepositoryCreator = new ConcreteBookRepositoryCreator();
 	const bookRepository = bookRepositoryCreator.create();
 	const bookController = new BookController(bookRepository);
 
-	const loanRepositoryCreator = new ConcreteLoanRepositoryCreator();
-	const loanRepository = loanRepositoryCreator.create();
-	const loanController = new LoanController(loanRepository);
-
 	const userRepositoryCreator = new ConcreteUserRepositoryCreator();
 	const userRepository = userRepositoryCreator.create();
 	const userController = new UserController(userRepository);
+
+
+	const loanRepositoryCreator = new ConcreteLoanRepositoryCreator();
+	const loanRepository = loanRepositoryCreator.create();
+	const loanFacade = new LoanFacade(loanRepository, bookRepository, userRepository);
+	const loanController = new LoanController(loanFacade);
+
+
 
 	return (
 		<Routes>

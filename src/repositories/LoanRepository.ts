@@ -51,6 +51,10 @@ export class LoanRepository extends Observable implements Repository<Loan> {
     return this.loans.filter(loan => loan.bookId === bookId);
   }
 
+  public findByUserIdAndBookId(userId: number, bookId: number): Loan | undefined {
+    return this.loans.find(loan => loan.userId === userId && loan.bookId === bookId);
+  }
+
   public list(): Loan[] {
     return this.loans;
   }

@@ -1,20 +1,20 @@
 import { Loan } from '../models/Loan';
+import { LoanFacade } from '../patterns/facade/LoanFacade';
 import { Observer } from '../patterns/observer/Observer';
-import { LoanRepository } from '../repositories/LoanRepository';
 import { LoanView } from '../views/LoanView';
 
 export default class LoanController implements Observer {
-  private loanRepository: LoanRepository;
+  private loanFacade: LoanFacade;
   private loanView: LoanView;
 
-  constructor(loanRepository: LoanRepository) {
-    this.loanRepository = loanRepository;
+  constructor(loanFacade: LoanFacade) {
+    this.loanFacade = loanFacade;
     this.loanView = new LoanView(
-      this.loanRepository.list(),
+      this.loanFacade.list(),
       this.delete.bind(this),
       this.upsert.bind(this),
     );
-    this.loanRepository.addObserver(this);
+    this.loanFacade.addObserver(this);
   }
 
   public upsert(
@@ -43,15 +43,18 @@ export default class LoanController implements Observer {
       loanDate,
       returnDate,
     );
-    return this.loanRepository.upsert(loan);
+    if (loan.returnDate) {
+      return this.loanFacade.returnBook(loan);
+    }
+    return this.loanFacade.loanBook(loan);
   }
 
   public delete(id: number) {
-    return this.loanRepository.delete(id);
+    return this.loanFacade.delete(id);
   }
 
   public list(): Loan[] {
-    return this.loanRepository.list();
+    return this.loanFacade.list();
   }
 
   public getView(): LoanView {
