@@ -7,6 +7,10 @@ export class BookRepository extends Observable implements Repository<Book> {
 	private static instance: BookRepository;
 	private id: number = 1;
 
+	private constructor() {
+		super();
+	}
+
 	public upsert(book: Book): Book {
 		if (book.id == 0 || book.id == undefined) {
 			return this.save(book);

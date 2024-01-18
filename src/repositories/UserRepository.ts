@@ -7,6 +7,10 @@ export class UserRepository extends Observable implements Repository<User> {
   private static instance: UserRepository;
 	private id: number = 1;
 
+  private constructor() {
+		super();
+	}
+
   public save(user: User): User {
     user.id = this.id++;
     this.users.push(user);

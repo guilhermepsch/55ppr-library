@@ -8,6 +8,10 @@ export class LoanRepository extends Observable implements Repository<Loan> {
   private static instance: LoanRepository;
   private id: number = 1;
 
+  private constructor() {
+		super();
+	}
+
   public save(loan: Loan): Loan {
     loan.id = this.id++;
     this.loans.push(loan);
