@@ -1,4 +1,8 @@
 import { Loan } from '../models/Loan';
+import { Command } from '../patterns/command/Command';
+import { DeleteLoanCommand } from '../patterns/command/DeleteLoanCommand';
+import { LoanBookCommand } from '../patterns/command/LoanBookCommand';
+import { ReturnBookCommand } from '../patterns/command/ReturnBookCommand';
 import { LoanFacade } from '../patterns/facade/LoanFacade';
 import { Observer } from '../patterns/observer/Observer';
 import { LoanView } from '../views/LoanView';
@@ -11,19 +15,19 @@ export default class LoanController implements Observer {
     this.loanFacade = loanFacade;
     this.loanView = new LoanView(
       this.loanFacade.list(),
-      this.delete.bind(this),
-      this.upsert.bind(this),
+      this.executeDelete.bind(this),
+      this.executeUpsert.bind(this)
     );
     this.loanFacade.addObserver(this);
   }
 
-  public upsert(
+  private executeUpsert(
     id: number,
     bookId: number,
     userId: number,
     loanDate: Date,
-    returnDate?: Date,
-  ) {
+    returnDate?: Date
+  ): void {
     if (Number.isNaN(id) || id == undefined) {
       id = 0;
     }
@@ -36,21 +40,22 @@ export default class LoanController implements Observer {
     if (loanDate == undefined) {
       throw new Error('Loan Date is required');
     }
-    const loan = new Loan(
-      id,
-      bookId,
-      userId,
-      loanDate,
-      returnDate,
-    );
-    if (loan.returnDate) {
-      return this.loanFacade.returnBook(loan);
-    }
-    return this.loanFacade.loanBook(loan);
+    const loan = new Loan(id, bookId, userId, loanDate, returnDate);
+
+    const upsertCommand: Command =
+      loan.returnDate != undefined
+        ? new ReturnBookCommand(this.loanFacade, loan)
+        : new LoanBookCommand(this.loanFacade, loan);
+
+    upsertCommand.execute();
   }
 
-  public delete(id: number) {
-    return this.loanFacade.delete(id);
+  private executeDelete(id: number): void {
+    const deleteCommand: Command = new DeleteLoanCommand(
+      this.loanFacade,
+      id
+    );
+    deleteCommand.execute();
   }
 
   public list(): Loan[] {

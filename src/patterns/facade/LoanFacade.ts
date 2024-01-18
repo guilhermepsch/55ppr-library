@@ -20,24 +20,30 @@ export class LoanFacade {
     const book = this.bookRepository.findById(loan.bookId)
     const user = this.userRepository.findById(loan.userId)
     if (!book || !user) {
+      alert('Livro ou usuário não encontrado')
       return
     }
     const existingLoans = this.loanRepository.findByUserId(user.id)
     for (const existingLoan of existingLoans) {
       if (!existingLoan.returnDate) {
+        alert('Usuário tem livro para devolver')
         return
       }
       if (existingLoan.returnDate > new Date()) {
+        alert('Usuário tem livro para devolver')
         return
       }
       if (existingLoan.bookId === book.id) {
+        alert('Usuário já tem esse livro')
         return
       }
     }
     if (book.availableCopies <= 0) {
+      alert('Livro não disponível')
       return
     }
     if (!book.isAvailable) {
+      alert('Livro não disponível')
       return
     }
     book.availableCopies--
