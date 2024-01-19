@@ -1,8 +1,9 @@
 import { ArrowClockwise } from '@phosphor-icons/react';
-import NavBar from '../components/NavBar';
+import { NavBar } from '../components/NavBar';
 import { Loan } from '../models/Loan';
 import { BookView } from './BookView';
 import { UserView } from './UserView';
+import { AbstractNavBarFactory } from '../patterns/abstractFactory/interfaces/AbstractNavBarFactory';
 
 export class LoanView {
 	loans: Loan[];
@@ -14,6 +15,7 @@ export class LoanView {
 		loanDate: Date,
 		returnDate?: Date,
 	) => void;
+	navBarFactory: AbstractNavBarFactory;
 
 	constructor(
 		loans: Loan[],
@@ -25,10 +27,12 @@ export class LoanView {
 			loanDate: Date,
 			returnDate?: Date,
 		) => void,
+		navBarFactory: AbstractNavBarFactory,
 	) {
 		this.loans = loans;
 		this.handleDelete = handleDelete;
 		this.handleSave = handleSave;
+		this.navBarFactory = navBarFactory;
 	}
 
 	public updateTable(loans: Loan[]) {
@@ -44,7 +48,7 @@ export class LoanView {
 	public loadTable() {
 		const tbody = document.getElementById('loan-tbody');
 		if (!tbody) return;
-    tbody.innerHTML = '';
+		tbody.innerHTML = '';
 		this.loans.forEach(loan => {
 			tbody.appendChild(this.createLoanRow(loan));
 		});
@@ -75,17 +79,22 @@ export class LoanView {
 			[],
 			() => {},
 			() => {},
+			this.navBarFactory,
 		);
 		bookView.clearTable();
 		const userView = new UserView(
 			[],
 			() => {},
 			() => {},
+			this.navBarFactory,
 		);
 		userView.clearTable();
 		return (
 			<>
-				<NavBar clearTable={this.clearTable.bind(this)} />
+				<NavBar
+					navBarFactory={this.navBarFactory}
+					clearTable={this.clearTable.bind(this)}
+				/>
 				<div className="w-full flex items-center flex-col">
 					{this.getLoanForm()}
 					<h2 className="text-3xl font-bold mb-4">Loan List</h2>

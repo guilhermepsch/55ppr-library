@@ -1,4 +1,5 @@
 import { Loan } from '../models/Loan';
+import { AbstractNavBarFactory } from '../patterns/abstractFactory/interfaces/AbstractNavBarFactory';
 import { Command } from '../patterns/command/Command';
 import { DeleteLoanCommand } from '../patterns/command/DeleteLoanCommand';
 import { LoanBookCommand } from '../patterns/command/LoanBookCommand';
@@ -11,12 +12,13 @@ export default class LoanController implements Observer {
   private loanFacade: LoanFacade;
   private loanView: LoanView;
 
-  constructor(loanFacade: LoanFacade) {
+  constructor(loanFacade: LoanFacade, navBarFactory: AbstractNavBarFactory) {
     this.loanFacade = loanFacade;
     this.loanView = new LoanView(
       this.loanFacade.list(),
       this.executeDelete.bind(this),
-      this.executeUpsert.bind(this)
+      this.executeUpsert.bind(this),
+      navBarFactory,
     );
     this.loanFacade.addObserver(this);
   }

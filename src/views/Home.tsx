@@ -1,9 +1,14 @@
-import NavBar from '../components/NavBar';
+import { NavBar } from '../components/NavBar';
+import { AbstractNavBarFactory } from '../patterns/abstractFactory/interfaces/AbstractNavBarFactory';
 
-export default function Home() {
+interface HomeProps {
+	navBarFactory: AbstractNavBarFactory;
+}
+
+export default function Home({navBarFactory}: HomeProps): JSX.Element {
 	return (
 		<>
-			<NavBar clearTable={() => {}} />
+			<NavBar navBarFactory={navBarFactory} clearTable={() => {}} />
 			<div className="text-center p-4">
 				<h2 className="text-3xl font-bold mb-4">
 					Sobre

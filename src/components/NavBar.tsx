@@ -1,54 +1,42 @@
-import { Link } from 'react-router-dom';
+import { Component } from 'react';
+import { AbstractNavBarFactory } from '../patterns/abstractFactory/interfaces/AbstractNavBarFactory';
 
 interface NavBarProps {
+	navBarFactory: AbstractNavBarFactory;
 	clearTable: () => void;
 }
 
-export default function NavBar({ clearTable }: NavBarProps) {
-	return (
-		<nav className="bg-gray-800 text-white p-4">
-			<div className="flex justify-between">
-				<div className="flex">
-					<Link
-						to="/"
-						className="text-2xl font-bold hover:text-gray-300"
-						onClick={clearTable}
-					>
-						Biblioteca
-					</Link>
-					<Link
-						to="/users"
-						className="ml-4 hover:text-gray-300"
-						onClick={clearTable}
-					>
-						Usuários
-					</Link>
-					<Link
-						to="/books"
-						className="ml-4 hover:text-gray-300"
-						onClick={clearTable}
-					>
-						Livros
-					</Link>
-					<Link
-						to="/loans"
-						className="ml-4 hover:text-gray-300"
-						onClick={clearTable}
-					>
-						Empréstimos
-					</Link>
+export class NavBar extends Component<NavBarProps> {
+	private navBarFactory: AbstractNavBarFactory;
+	private clearTable: () => void;
+
+	constructor(props: NavBarProps) {
+		super({ ...props });
+		this.navBarFactory = props.navBarFactory;
+		this.clearTable = props.clearTable;
+	}
+
+	render() {
+		return (
+			<nav
+				className={' text-white p-4'}
+				style={{
+					backgroundColor: this.navBarFactory.createNavBarColor().getColor(),
+				}}>
+				<div className="flex justify-between">
+					<div className="flex">
+						{this.navBarFactory
+							.createLibraryButton()
+							.renderButton(this.clearTable)}
+						{this.navBarFactory
+							.createPagesButton()
+							.renderButton(this.clearTable)}
+					</div>
+					{this.navBarFactory
+						.createAboutButton()
+						.renderButton(this.clearTable)}
 				</div>
-				<div className="flex">
-					<Link
-						to="/"
-						className="ml-4 hover:text-gray-300"
-						onClick={clearTable}
-					>
-						Sobre
-					</Link>
-				</div>
-			</div>
-		</nav>
-	);
+			</nav>
+		);
+	}
 }
-		

@@ -1,6 +1,7 @@
-import NavBar from '../components/NavBar';
+import { NavBar } from '../components/NavBar';
 import { Book } from '../models/Book';
 import { ArrowClockwise } from '@phosphor-icons/react';
+import { AbstractNavBarFactory } from '../patterns/abstractFactory/interfaces/AbstractNavBarFactory';
 
 export class BookView {
 	books: Book[];
@@ -13,6 +14,7 @@ export class BookView {
 		isbn: string,
 		availableCopies: number,
 	) => void;
+	navBarFactory: AbstractNavBarFactory;
 
 	constructor(
 		books: Book[],
@@ -25,10 +27,12 @@ export class BookView {
 			isbn: string,
 			availableCopies: number,
 		) => void,
+		navBarFactory: AbstractNavBarFactory,
 	) {
 		this.books = books;
 		this.handleDelete = handleDelete;
 		this.handleSave = handleSave;
+		this.navBarFactory = navBarFactory;
 	}
 
 	public updateTable(books: Book[]) {
@@ -71,7 +75,7 @@ export class BookView {
 	public renderView(): JSX.Element {
 		return (
 			<>
-				<NavBar clearTable={this.clearTable.bind(this)} />
+				<NavBar navBarFactory={this.navBarFactory} clearTable={this.clearTable.bind(this)} />
 				<div className="w-full flex items-center flex-col">
 					{this.getBookForm()}
 					<h2 className="text-3xl font-bold mb-4">Book List</h2>

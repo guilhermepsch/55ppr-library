@@ -1,4 +1,5 @@
 import { User, UserRole } from '../models/User';
+import { AbstractNavBarFactory } from '../patterns/abstractFactory/interfaces/AbstractNavBarFactory';
 import { Observer } from '../patterns/observer/Observer';
 import { UserRepository } from '../repositories/UserRepository';
 import { UserView } from '../views/UserView';
@@ -8,12 +9,13 @@ export default class UserController implements Observer {
   private userRepository: UserRepository;
   private userView: UserView;
 
-  constructor(userRepository: UserRepository) {
+  constructor(userRepository: UserRepository, navBarFactory: AbstractNavBarFactory) {
     this.userRepository = userRepository;
     this.userView = new UserView(
       this.userRepository.list(),
       this.delete.bind(this),
       this.upsert.bind(this),
+      navBarFactory,
     );
     this.userRepository.addObserver(this);
   }

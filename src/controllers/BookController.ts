@@ -1,4 +1,5 @@
 import { Book } from '../models/Book';
+import { AbstractNavBarFactory } from '../patterns/abstractFactory/interfaces/AbstractNavBarFactory';
 import { Observer } from '../patterns/observer/Observer';
 import { BookRepository } from '../repositories/BookRepository';
 import { BookView } from '../views/BookView';
@@ -7,12 +8,13 @@ export default class BookController implements Observer {
 	private bookRepository: BookRepository;
 	private bookView: BookView;
 
-	constructor(bookRepository: BookRepository) {
+	constructor(bookRepository: BookRepository, navBarFactory: AbstractNavBarFactory) {
 		this.bookRepository = bookRepository;
 		this.bookView = new BookView(
 			this.bookRepository.list(),
 			this.delete.bind(this),
 			this.upsert.bind(this),
+			navBarFactory,
 		);
 		this.bookRepository.addObserver(this);
 	}
