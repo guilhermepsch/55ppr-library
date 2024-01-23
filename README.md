@@ -1,6 +1,6 @@
-# Recipe Rebel
+# 55PPR - Library
 
-Este repositório contém o código-fonte e os arquivos necessários para executar o aplicativo Recipe Rebel.
+Este repositório contém o código-fonte e os arquivos necessários para executar o aplicativo de biblioteca para a disciplina de 55ppr.
 
 ## Requisitos
 
@@ -29,21 +29,12 @@ O aplicativo usa variáveis de ambiente para configurar algumas de suas funciona
 Para executar o aplicativo, basta clonar o repositório e executar o comando `docker compose up` no diretório raiz do projeto. Isso irá construir e iniciar os contêineres necessários para executar o aplicativo.
 
 ```bash
-git clone https://github.com/guilhermepsch/projeto-integrador.git
-cd projeto-integrador
+git clone https://github.com/guilhermepsch/55ppr-library.git
+cd 55ppr-library
 docker compose up
 ```
 
-Após executar este comando, o aplicativo deverá estar disponível no localhost na porta que foi configurada no arquivo `.env`, tanto para web, como para backend e o banco de dados, é possível verificar o link exato na saída do comando.
-
-### Populando o banco de dados
-
-Assim que o serviço estiver rodando pela primeira vez, será necessário que você rode as migrations, para isso, execute o comando abaixo no terminal do contêiner do backend.
-
-```bash
-cd server
-npm run typeorm migration:run
-```
+Após executar este comando, o aplicativo deverá estar disponível no localhost na porta que foi configurada no arquivo `.env`, é possível verificar o link exato na saída do comando.
 
 ## Parando o aplicativo
 
